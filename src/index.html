@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <style>
+        body {
+            color: white;
+        }
+
+        .bg-plane {
+          position: fixed;
+          left: 0;
+          right: 0;
+          z-index: -9999;
+
+          display: block;
+            background-image: url('bg.png');
+            /* Add the blur effect */
+            filter: blur(8px);
+            -webkit-filter: blur(8px);
+
+            /* Full height */
+            height: 100%;
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        html, body {
+          height: 100%;
+          margin: 0px;
+        }
+
+        .full-height {
+          height: 100%;
+          width: 100%;
+        }
+
+    </style>
+  </head>
+  <body bgcolor="black">
+    <div class="bg-plane"></div>
+    <input type="button" id="btn-opendir" value="Open file" style="position: absolute; right:0px" />
+    <div id="openseadragon1" class="full-height"></div>
+    <div id="nav" style="position: absolute; bottom: 0px; background-color: rgba(255,0,0,0.5); height: 150px; width: 100%; z-index: 9999;">
+      <input id="next" type="button" value="next"/>
+      <input id="prev" type="button" value="prev"/>
+    </div>
+    <script src="openseadragon/openseadragon.min.js"></script>
+    <script type="text/javascript">
+        var viewer = null;
+        let pageMax = 0;
+        const fs = require("fs");
+        const dialog = require('electron').remote.dialog;
+        const { BrowserWindow } = require('electron').remote;
+        document.addEventListener("keydown", event => {
+            switch (event.key) {
+                case "Escape":
+                    var window = BrowserWindow.getFocusedWindow();
+                if(window.isMaximized()){
+                window.unmaximize();
+              }else{
+                window.maximize();
+              };
+                    break;
+            }
+        });
+
+        document.onkeydown = function(event) {
+            switch (event.keyCode) {
+              case 37:
+                    if (viewer.currentPage() == 0) {
+                      viewer.goToPage(pageMax - 1);
+                    }
+                    else {
+                      viewer.goToPage(viewer.currentPage() - 1);
+                    }
+                  break;
+              case 39:
+                    if (viewer.currentPage() == pageMax - 1) {
+                      viewer.goToPage(0);
+                    }
+                    else {
+                      viewer.goToPage(viewer.currentPage() + 1);
+                    }
+                  break;
+                
+            }
+        };
+
+        document.getElementById("btn-opendir").addEventListener("click", () => {
+          dialog.showOpenDialog({
+            properties: ['openDirectory']
+          }, (dir) => {
+            if (dir === undefined) {
+              console.log("No directory was selected");
+              return;
+            }
+
+            console.log(dir);
+            fs.readdir(dir[0], function(err, files) {
+              if (err) return;
+
+              images = [];
+              files.forEach(element => {
+                images.push({ type: "image", url: dir[0] + "\\" + element});
+                console.log(dir[0] + element);
+              });
+              pageMax = images.length;
+              viewer = OpenSeadragon({
+                  id: "openseadragon1",
+                  prefixUrl: "openseadragon/images/",
+                  toolbar: "nav",
+                  showNavigationControl: false,
+                  showSequenceControl: false,
+                  navPrevNextWrap: true,
+                  tileSources: images,
+                  sequenceMode: true,
+                  maxZoomPixelRatio: 	Infinity,
+                  minZoomImageRatio:   0
+              });
+            });
+            /*
+            fs.readFile(fileNames[0], (err, data) => {
+              if (err) return;
+              var base64data = new Buffer(data).toString('base64');
+              //console.log(base64data);
+              viewer.open({ type: "image", url: "data:image/png;base64," + base64data });
+            })*/
+          });
+        });
+    </script>
+  </body>
+</html>
