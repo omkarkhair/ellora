@@ -5,7 +5,7 @@ const screenshot = require('screenshot-desktop')
 screenshot({format: 'png'}).then((img) => {
   // img: Buffer filled with jpg goodness
   // ...
-  fs.writeFile("bg.png", img, function(err) {
+  fs.writeFile("src/bg.png", img, function(err) {
       if(err) {
           return console.log(err);
       }
