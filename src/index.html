@@ -45,10 +45,6 @@
     <div class="bg-plane"></div>
     <input type="button" id="btn-opendir" value="Open file" style="position: absolute; right:0px" />
     <div id="openseadragon1" class="full-height"></div>
-    <div id="nav" style="position: absolute; bottom: 0px; background-color: rgba(255,0,0,0.5); height: 150px; width: 100%; z-index: 9999;">
-      <input id="next" type="button" value="next"/>
-      <input id="prev" type="button" value="prev"/>
-    </div>
     <script src="openseadragon/openseadragon.min.js"></script>
     <script type="text/javascript">
         var viewer = null;
@@ -57,6 +53,33 @@
         const fs = require("fs");
         const dialog = require('electron').remote.dialog;
         const { BrowserWindow } = require('electron').remote;
+        const {ipcRenderer} = require('electron');
+        const electron = require('electron');
+        var app = electron.remote;
+
+        function loadViewer (images) {
+          console.log(images);
+          pageMax = images.length;
+          viewer = OpenSeadragon({
+              id: "openseadragon1",
+              prefixUrl: "openseadragon/images/",
+              showNavigationControl: false,
+              showSequenceControl: false,
+              navPrevNextWrap: true,
+              tileSources: images,
+              sequenceMode: true,
+              maxZoomPixelRatio: 	Infinity,
+              minZoomImageRatio:   0
+          });
+        }
+
+        if (app.process.platform == 'win32' && app.process.argv.length >= 2) {
+            var openFilePath = app.process.argv[1];
+            if (openFilePath !== "" && openFilePath !== ".") {
+                console.log(openFilePath);
+                loadViewer([{ type: "image", url: openFilePath}]);
+            }
+        }
 
         const goNext = false;
         const goPrev = false;
@@ -123,7 +146,7 @@
         });
 
         document.onkeydown = function(event) {
-            console.log("DOWN", event.key)
+            console.log("DOWN", event.keyCode)
             switch (event.keyCode) {
               case 37:
                     //goPrev = setInterval(intervalPrev, 150);
@@ -138,10 +161,14 @@
                   viewer.viewport.zoomTo(zoom/100);
                   break;
               case 40:
+                  if (zoom/100 <= 0.1)
+                    return;
                   zoom -= 10;
                   viewer.viewport.zoomTo(zoom/100);
                   break;
-                
+              case 27:
+                  ipcRenderer.send('exit-app');
+                  break;
             }
         };
 
@@ -161,21 +188,9 @@
               images = [];
               files.forEach(element => {
                 images.push({ type: "image", url: dir[0] + "\\" + element});
-                console.log(dir[0] + element);
+                console.log(dir[0] + "\\" + element);
               });
-              pageMax = images.length;
-              viewer = OpenSeadragon({
-                  id: "openseadragon1",
-                  prefixUrl: "openseadragon/images/",
-                  toolbar: "nav",
-                  showNavigationControl: false,
-                  showSequenceControl: false,
-                  navPrevNextWrap: true,
-                  tileSources: images,
-                  sequenceMode: true,
-                  maxZoomPixelRatio: 	Infinity,
-                  minZoomImageRatio:   0
-              });
+              loadViewer(images);
             });
             /*
             fs.readFile(fileNames[0], (err, data) => {

@@ -18,7 +18,10 @@
     "appId": "com.ellora.viewer",
     "fileAssociations": {
       "ext": [
-        "idk"
+        "jpg",
+        "jpeg",
+        "png",
+        "bmp"
       ],
       "name": "I Don't Know",
       "description": "Some description of the file type.",

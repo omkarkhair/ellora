@@ -1,7 +1,11 @@
 const { app, BrowserWindow } = require('electron')
 const fs = require("fs");
 const screenshot = require('screenshot-desktop')
- 
+const {ipcMain} = require('electron');
+import { addBypassChecker } from 'electron-compile';
+
+addBypassChecker((filePath) => { return filePath.indexOf(app.getAppPath()) === -1 && (/.jpg/.test(filePath) || /.ms/.test(filePath) || /.png/.test(filePath)); });
+
 screenshot({format: 'png'}).then((img) => {
   // img: Buffer filled with jpg goodness
   // ...
@@ -29,7 +33,8 @@ function createWindow () {
     frame: false,
     fullscreen: true,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webSecurity: false
     }
   })
 
@@ -37,7 +42,7 @@ function createWindow () {
   win.loadURL(`file://${__dirname}/index.html`);
 
   // Open the DevTools.
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -72,3 +77,7 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.on('exit-app', (evt, arg) => {
+  app.quit()
+})
