@@ -43,7 +43,6 @@
   </head>
   <body bgcolor="black">
     <div class="bg-plane"></div>
-    <input type="button" id="btn-opendir" value="Open file" style="position: absolute; right:0px" />
     <div id="openseadragon1" class="full-height"></div>
     <script src="openseadragon/openseadragon.min.js"></script>
     <script type="text/javascript">
@@ -55,10 +54,14 @@
         const { BrowserWindow } = require('electron').remote;
         const {ipcRenderer} = require('electron');
         const electron = require('electron');
+        const path = require('path');
         var app = electron.remote;
 
-        function loadViewer (images) {
+        const supportedFileTypes = ['jpg', 'jpeg', 'png', 'bmp', ];
+
+        function loadViewer (images, index) {
           console.log(images);
+          
           pageMax = images.length;
           viewer = OpenSeadragon({
               id: "openseadragon1",
@@ -71,14 +74,26 @@
               maxZoomPixelRatio: 	Infinity,
               minZoomImageRatio:   0
           });
+
+          viewer.goToPage(index - 1);
         }
 
         if (app.process.platform == 'win32' && app.process.argv.length >= 2) {
-            var openFilePath = app.process.argv[1];
-            if (openFilePath !== "" && openFilePath !== ".") {
-                console.log(openFilePath);
-                loadViewer([{ type: "image", url: openFilePath}]);
+            var file = app.process.argv[1];
+            if (file !== "" && file !== ".") {
+              
             }
+            else {
+              file = "C:\\Users\\Omkar Khair\\Pictures\\ray.png";
+            }
+
+            console.log(file);
+            var dir = path.dirname(file);
+            console.log(dir);
+            //loadViewer([{ type: "image", url: openFilePath}]);
+            let split = file.split('\\');
+            file = split[split.length - 1];
+            loadDir(dir, file);
         }
 
         const goNext = false;
@@ -172,35 +187,35 @@
             }
         };
 
-        document.getElementById("btn-opendir").addEventListener("click", () => {
-          dialog.showOpenDialog({
-            properties: ['openDirectory']
-          }, (dir) => {
-            if (dir === undefined) {
+        function loadDir (dir, file) {
+          if (dir === undefined) {
               console.log("No directory was selected");
               return;
             }
 
             console.log(dir);
-            fs.readdir(dir[0], function(err, files) {
-              if (err) return;
+            fs.readdir(dir, function(err, files) {
+              if (err) { 
+                console.log(err);
+                return;
+              }
 
               images = [];
+              let index = 0;
               files.forEach(element => {
-                images.push({ type: "image", url: dir[0] + "\\" + element});
-                console.log(dir[0] + "\\" + element);
+                let split = element.split('.');
+                let extension = split[split.length - 1];
+                if (supportedFileTypes.includes(extension)) {
+                  images.push({ type: "image", url: dir + "\\" + element});
+                  console.log(dir + "\\" + element);
+                  if (element == file) {
+                    index = images.length;
+                  }
+                }
               });
-              loadViewer(images);
+              loadViewer(images, index);
             });
-            /*
-            fs.readFile(fileNames[0], (err, data) => {
-              if (err) return;
-              var base64data = new Buffer(data).toString('base64');
-              //console.log(base64data);
-              viewer.open({ type: "image", url: "data:image/png;base64," + base64data });
-            })*/
-          });
-        });
+        }
     </script>
   </body>
 </html>
