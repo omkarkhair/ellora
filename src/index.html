@@ -72,10 +72,13 @@
               tileSources: images,
               sequenceMode: true,
               maxZoomPixelRatio: 	Infinity,
-              minZoomImageRatio:   0
+              minZoomImageRatio:   0,
+              sequenceMode: true,
+              showReferenceStrip: true,
+              initialPage: index - 1,
+              immediateRender: true,
+              preload: true
           });
-
-          viewer.goToPage(index - 1);
         }
 
         if (app.process.platform == 'win32' && app.process.argv.length >= 2) {
