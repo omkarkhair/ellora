@@ -1,15 +1,11 @@
 pool:
-  vmImage: "Ubuntu 16.04"
+  vmImage: "windows-latest"
 
 steps:
   - task: NodeTool@0
     inputs:
       versionSpec: "8.x"
     displayName: "Install Node.js"
-
-  - script: |
-      sudo apt-get install dpkg fakeroot -y
-    displayName: "Install dpkg & fakeroot"
 
   - script: |
       yarn install
