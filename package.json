@@ -52,8 +52,8 @@
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
       "github_repository": {
-        "owner": "",
-        "name": ""
+        "owner": "omkarkhair",
+        "name": "ellora"
       },
       "windowsStoreConfig": {
         "packageName": "",
