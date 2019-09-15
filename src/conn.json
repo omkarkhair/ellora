@@ -1,0 +1,27 @@
+{
+  "authentication": {
+    "symmetricKey": {
+      "primaryKey": "D3eei217VpCwyaRWGSq0YaqCe7tQChhZnQJmki6TPaw=",
+      "secondaryKey": "9DxE0uspebIN876BCf07lXuoa5k6GK46kZzEB6SlQ48="
+    },
+    "type": "sas",
+    "x509Thumbprint": {
+      "primaryThumbprint": null,
+      "secondaryThumbprint": null
+    }
+  },
+  "capabilities": {
+    "iotEdge": true
+  },
+  "cloudToDeviceMessageCount": 0,
+  "connectionState": "Disconnected",
+  "connectionStateUpdatedTime": "0001-01-01T00:00:00",
+  "deviceId": "Pi1",
+  "deviceScope": "ms-azure-iot-edge://Pi1-636993276377827152",
+  "etag": "MzUxNjUyNDYz",
+  "generationId": "636993276377827152",
+  "lastActivityTime": "0001-01-01T00:00:00",
+  "status": "enabled",
+  "statusReason": null,
+  "statusUpdatedTime": "0001-01-01T00:00:00"
+}
